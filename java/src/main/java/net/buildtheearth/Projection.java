@@ -32,7 +32,7 @@ public class Projection {
      */
     public static GeographicalCoordinate toGeo(MinecraftCoordinate coordinate) throws OutOfProjectionBoundsException {
         double[] res = projection.toGeo(coordinate.x(), coordinate.z());
-        return new GeographicalCoordinate(res[0], res[1]);
+        return new GeographicalCoordinate(res[1], res[0]);
     }
 
     /**
