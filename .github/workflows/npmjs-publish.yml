@@ -4,6 +4,8 @@ on:
   push:
     paths:
       - 'typescript/**'
+    branches:
+      - main
     
 permissions:
   id-token: write  # Required for OIDC
