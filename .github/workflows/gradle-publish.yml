@@ -4,6 +4,8 @@ on:
   push:
     paths:
       - 'java/**'
+    branches:
+      - main
 
 jobs:
   build:
