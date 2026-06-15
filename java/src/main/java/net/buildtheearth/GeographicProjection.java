@@ -10,15 +10,19 @@ import java.util.Map;
 
 /**
  * Support for various projection types.
- *
+ * <p>
  * The geographic space is the surface of the earth, parameterized by the usual spherical coordinates system of latitude and longitude.
  * The projected space is a plane on to which the geographic space is being projected, and is parameterized by a 2D Cartesian coordinate system (x and y).
- *
+ * <p>
  * A projection as defined here is something that projects a point in the geographic space to a point of the projected space (and vice versa).
- *
+ * <p>
  * All geographic coordinates are in degrees.
- *
- *
+ * <ul>Note: Projection steps consist of normalization and transformation both <u>forwards</u> and <u>backwards</u>.
+ *     <li><u>normalization</u>: The normalization of input units</li>
+ *     <li><u>transformation</u>: The actual calculation to project the unit into implementing Geographic Projection.</li>
+ * </ul>
+ * @see #fromGeo(double, double)
+ * @see #toGeo(double, double)
  * @see <a href="https://en.wikipedia.org/wiki/Equirectangular_projection">Wikipedia's article on the equirectangular projection</a>
  */
 public abstract class GeographicProjection {
@@ -61,28 +65,76 @@ public abstract class GeographicProjection {
         return base;
     }
 
+    /**
+     * The backwards <u>normalization</u> of this projection,
+     * or the inverse transform.
+     * De-normalize map coordinates back to degrees.
+     *
+     * @param lambda x map coordinate (normalized)
+     * @param phi y map coordinate (normalized)
+     * @return {longitude, latitude} in degrees
+     * @throws OutOfProjectionBoundsException if the coordinate can't be transformed.
+     */
+    protected abstract double[] inverseTransform(double lambda, double phi) throws OutOfProjectionBoundsException;
+
+    /**
+     * The backwards <u>transformation</u> of this projection, or the inverse transform.
+     * transform the map coordinate point to normalized spherical (or ellipse) unit.
+     *
+     * @param x x map coordinate.
+     * @param y y map coordinate.
+     * @return {lambda, phi} normalized coordinate point after transforming x, y.
+     * @throws OutOfProjectionBoundsException if the coordinate can't be transformed.
+     */
+    public abstract double[] inverseTransformNormalized(double x, double y) throws OutOfProjectionBoundsException;
 
     /**
      * Converts map coordinates to geographic coordinates
      *
-     * @param x - x map coordinate
-     * @param y - y map coordinate
-     *
+     * @param x x map coordinate
+     * @param y y map coordinate
      * @return {longitude, latitude} in degrees
      * @throws OutOfProjectionBoundsException if the specified point on the projected space cannot be mapped to a point of the geographic space
      */
-    public abstract double[] toGeo(double x, double y) throws OutOfProjectionBoundsException;
+    public final double[] toGeo(double x, double y) throws OutOfProjectionBoundsException {
+        double[] inverse = inverseTransformNormalized(x, y);
+        return inverseTransform(inverse[0], inverse[1]);
+    }
 
     /**
      * Converts geographic coordinates to map coordinates
      *
-     * @param longitude - longitude, in degrees
-     * @param latitude - latitude, in degrees
-     *
+     * @param longitude longitude, in degrees
+     * @param latitude  latitude, in degrees
      * @return {x, y} map coordinates
      * @throws OutOfProjectionBoundsException if the specified point on the geographic space cannot be mapped to a point of the projected space
      */
-    public abstract double[] fromGeo(double longitude, double latitude) throws OutOfProjectionBoundsException;
+    public final double[] fromGeo(double longitude, double latitude) throws OutOfProjectionBoundsException {
+        double[] transform = transform(longitude, latitude);
+        return transformNormalized(transform[0], transform[1]);
+    }
+
+    /**
+     * The forward <u>normalization</u> of this projection.
+     * Normalizes the lat, long unit to radians.
+     *
+     * @param longitude longitude, in degrees
+     * @param latitude  latitude, in degrees
+     * @return {lambda, phi} in radians after transforming longitude, latitude.
+     * @throws OutOfProjectionBoundsException if the coordinate can't be transformed.
+     */
+    protected abstract double[] transform(double longitude, double latitude) throws OutOfProjectionBoundsException;
+
+    /**
+     * The forward <u>transformation</u> of this projection.
+     * transform lat, long in radians to the projection's map coordinate.
+     *
+     * @param lambda longitude (normalized) in radians
+     * @param phi    latitude, (normalized) in radians
+     * @return {x, y} map coordinates in the projection's unit
+     * @throws OutOfProjectionBoundsException if the coordinate can't be transformed.
+     */
+    public abstract double[] transformNormalized(double lambda, double phi) throws OutOfProjectionBoundsException;
 
     /**
      * Gives an estimation of the scale of this projection.

@@ -24,4 +24,14 @@ public abstract class ProjectionTransform extends GeographicProjection {
     public double metersPerUnit() {
         return this.input.metersPerUnit();
     }
+
+    @Override
+    protected double[] inverseTransform(double x, double y) throws OutOfProjectionBoundsException {
+        return this.input.toGeo(x, y);
+    }
+
+    @Override
+    protected double[] transform(double longitude, double latitude) throws OutOfProjectionBoundsException {
+        return this.input.fromGeo(longitude, latitude);
+    }
 }

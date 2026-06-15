@@ -27,8 +27,8 @@ public class ModifiedAirocean extends ConformalEstimate {
     protected static final double ALEUTIAN_B = BERING_Y - ALEUTIAN_M * BERING_X;
 
     @Override
-    public double[] fromGeo(double longitude, double latitude) {
-        double[] c = super.fromGeo(longitude, latitude);
+    public double[] transformNormalized(double lambda, double phi) {
+        double[] c = super.transformNormalized(lambda, phi);
         double x = c[0];
         double y = c[1];
 
@@ -53,7 +53,7 @@ public class ModifiedAirocean extends ConformalEstimate {
     }
 
     @Override
-    public double[] toGeo(double x, double y) throws OutOfProjectionBoundsException {
+    public double[] inverseTransformNormalized(double x, double y) throws OutOfProjectionBoundsException {
         boolean easia;
         if (y < 0) {
             easia = x > 0;
@@ -82,7 +82,7 @@ public class ModifiedAirocean extends ConformalEstimate {
         //check to make sure still in right part
         if (easia != this.isEurasianPart(x, y)) throw OutOfProjectionBoundsException.get();
 
-        return super.toGeo(x, y);
+        return super.inverseTransformNormalized(x, y);
     }
 
     protected boolean isEurasianPart(double x, double y) {

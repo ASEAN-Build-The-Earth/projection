@@ -14,15 +14,13 @@ public class UprightOrientationProjectionTransform extends ProjectionTransform {
     }
 
     @Override
-    public double[] toGeo(double x, double y) throws OutOfProjectionBoundsException {
-        return this.input.toGeo(x, -y);
+    public double[] transformNormalized(double x, double y) {
+        return new double[] { x, -y };
     }
 
     @Override
-    public double[] fromGeo(double longitude, double latitude) throws OutOfProjectionBoundsException {
-        double[] p = this.input.fromGeo(longitude, latitude);
-        p[1] = -p[1];
-        return p;
+    public double[] inverseTransformNormalized(double x, double y) {
+        return new double[] { x, -y };
     }
 
     @Override

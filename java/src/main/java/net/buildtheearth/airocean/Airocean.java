@@ -342,11 +342,10 @@ public class Airocean extends GeographicProjection {
     }
 
     @Override
-    public double[] fromGeo(double longitude, double latitude) {
+    public double[] transformNormalized(double lambda, double phi) {
+        double[] vector = MathUtils.spherical2Cartesian(new double[]{ lambda, phi });
 
-        double[] vector = MathUtils.spherical2Cartesian(MathUtils.geo2Spherical(new double[] {longitude, latitude}));
-
-        int face = findTriangle(vector);
+        int face = this.findTriangle(vector);
 
         //apply rotation matrix (move triangle onto template triangle)
         double[] pvec = MathUtils.matVecProdD(ROTATION_MATRICES[face], vector);
@@ -373,7 +372,17 @@ public class Airocean extends GeographicProjection {
     }
 
     @Override
-    public double[] toGeo(double x, double y) throws OutOfProjectionBoundsException {
+    protected double[] transform(double longitude, double latitude) {
+        return MathUtils.geo2Spherical(new double[]{ longitude, latitude });
+    }
+
+    @Override
+    protected double[] inverseTransform(double lambda, double phi) {
+        return MathUtils.spherical2Geo(new double[]{ lambda, phi });
+    }
+
+    @Override
+    public double[] inverseTransformNormalized(double x, double y) throws OutOfProjectionBoundsException {
         int face = findTriangleGrid(x, y);
 
         if (face == -1) throw OutOfProjectionBoundsException.get();
@@ -413,8 +422,7 @@ public class Airocean extends GeographicProjection {
         //apply inverse rotation matrix (move triangle from template triangle to correct position on globe)
         double[] vecp = MathUtils.matVecProdD(INVERSE_ROTATION_MATRICES[face], vec);
 
-        //convert back to geo coordinates
-        return MathUtils.spherical2Geo(MathUtils.cartesian2Spherical(vecp));
+        return MathUtils.cartesian2Spherical(vecp);
     }
 
     @Override
