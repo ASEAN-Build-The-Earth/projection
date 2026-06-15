@@ -26,9 +26,7 @@ public class ModifiedAirocean extends ConformalEstimate {
     protected static final double ALEUTIAN_M = (BERING_Y - ALEUTIAN_Y) / (BERING_X - ALEUTIAN_XR);
     protected static final double ALEUTIAN_B = BERING_Y - ALEUTIAN_M * BERING_X;
 
-    @Override
-    public double[] fromGeo(double longitude, double latitude) {
-        double[] c = super.fromGeo(longitude, latitude);
+    private double[] transformNormalized(double[] c) {
         double x = c[0];
         double y = c[1];
 
@@ -50,6 +48,18 @@ public class ModifiedAirocean extends ConformalEstimate {
         c[0] = y;
         c[1] = -x;
         return c;
+    }
+
+    @Override
+    public double[] fromGeo(double longitude, double latitude) {
+        double[] c = super.fromGeo(longitude, latitude);
+        return transformNormalized(c);
+    }
+
+    @Override
+    public double[] fromGeoNormalized(double lambda, double phi) {
+        double[] c = super.fromGeoNormalized(lambda, phi);
+        return transformNormalized(c);
     }
 
     @Override

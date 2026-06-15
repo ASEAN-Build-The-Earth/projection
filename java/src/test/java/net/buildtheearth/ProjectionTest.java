@@ -43,6 +43,10 @@ public class ProjectionTest {
 			MinecraftCoordinate projected = Projection.toMinecraft(geographicalCoordinate);
 			assertEquals(pair.x, projected.x(), EPSILON, "x mismatch at pair index " + i);
 			assertEquals(pair.z, projected.z(), EPSILON, "z mismatch at pair index " + i);
+
+			GeographicalCoordinate inversed = Projection.toGeo(projected);
+			assertEquals(pair.lat, inversed.latitude(), EPSILON, "latitude mismatch at pair index " + i);
+			assertEquals(pair.lon, inversed.longitude(), EPSILON, "longitude mismatch at pair index " + i);
 		}
 	}
 

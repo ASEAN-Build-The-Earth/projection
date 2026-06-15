@@ -341,12 +341,10 @@ public class Airocean extends GeographicProjection {
         return this.inverseTriangleTransformNewton(x, y);
     }
 
-    @Override
-    public double[] fromGeo(double longitude, double latitude) {
+    protected double[] transformNormalized(double lambda, double phi) {
+        double[] vector = MathUtils.spherical2Cartesian(new double[]{ lambda, phi });
 
-        double[] vector = MathUtils.spherical2Cartesian(MathUtils.geo2Spherical(new double[] {longitude, latitude}));
-
-        int face = findTriangle(vector);
+        int face = this.findTriangle(vector);
 
         //apply rotation matrix (move triangle onto template triangle)
         double[] pvec = MathUtils.matVecProdD(ROTATION_MATRICES[face], vector);
@@ -370,6 +368,24 @@ public class Airocean extends GeographicProjection {
         projectedVec[1] += CENTER_MAP[face][1];
 
         return projectedVec;
+    }
+
+    @Override
+    public double[] fromGeo(double longitude, double latitude) {
+        double[] spherical = MathUtils.geo2Spherical(new double[]{ longitude, latitude });
+        double lambda = spherical[0];
+        double phi = spherical[1];
+        return transformNormalized(lambda, phi);
+    }
+
+    @Override
+    public double[] fromGeoNormalized(double lambda, double phi) {
+        return transformNormalized(lambda, phi);
+    }
+
+    @Override
+    public double[] toGeoNormalized(double lambda, double phi) {
+        return MathUtils.spherical2Geo(new double[]{ lambda, phi });
     }
 
     @Override
@@ -412,9 +428,9 @@ public class Airocean extends GeographicProjection {
         double[] vec = new double[] {x, y, z};
         //apply inverse rotation matrix (move triangle from template triangle to correct position on globe)
         double[] vecp = MathUtils.matVecProdD(INVERSE_ROTATION_MATRICES[face], vec);
+        double[] spherical = MathUtils.cartesian2Spherical(vecp);
 
-        //convert back to geo coordinates
-        return MathUtils.spherical2Geo(MathUtils.cartesian2Spherical(vecp));
+        return toGeoNormalized(spherical[0], spherical[1]);
     }
 
     @Override

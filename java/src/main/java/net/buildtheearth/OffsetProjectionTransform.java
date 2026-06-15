@@ -31,13 +31,14 @@ public class OffsetProjectionTransform extends ProjectionTransform {
     }
 
     @Override
-    public double[] toGeo(double x, double y) throws OutOfProjectionBoundsException {
-        return this.input.toGeo(x - this.deltaX, y - this.deltaY);
+    public double[] inverseTransform(double[] pos) {
+        pos[0] -= this.deltaX;
+        pos[1] -= this.deltaY;
+        return pos;
     }
 
     @Override
-    public double[] fromGeo(double longitude, double latitude) throws OutOfProjectionBoundsException {
-        double[] pos = this.input.fromGeo(longitude, latitude);
+    public double[] transform(double[] pos) {
         pos[0] += this.deltaX;
         pos[1] += this.deltaY;
         return pos;

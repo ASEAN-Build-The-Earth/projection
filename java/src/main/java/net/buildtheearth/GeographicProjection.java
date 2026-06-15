@@ -61,28 +61,51 @@ public abstract class GeographicProjection {
         return base;
     }
 
+    /**
+     * Converts map coordinates to geographic coordinates
+     *
+     * @param lambda x map coordinate (normalized)
+     * @param phi y map coordinate (normalized)
+     * @return {longitude, latitude} in degrees
+     */
+    public abstract double[] toGeoNormalized(double lambda, double phi);
 
     /**
      * Converts map coordinates to geographic coordinates
      *
-     * @param x - x map coordinate
-     * @param y - y map coordinate
-     *
+     * @param x x map coordinate
+     * @param y y map coordinate
      * @return {longitude, latitude} in degrees
      * @throws OutOfProjectionBoundsException if the specified point on the projected space cannot be mapped to a point of the geographic space
      */
-    public abstract double[] toGeo(double x, double y) throws OutOfProjectionBoundsException;
+    public double[] toGeo(double x, double y) throws OutOfProjectionBoundsException {
+        double lambda = Math.toRadians(x);
+        double phi = Math.toRadians(y);
+        return toGeoNormalized(lambda, phi);
+    }
 
     /**
      * Converts geographic coordinates to map coordinates
      *
-     * @param longitude - longitude, in degrees
-     * @param latitude - latitude, in degrees
-     *
+     * @param longitude longitude, in degrees
+     * @param latitude  latitude, in degrees
      * @return {x, y} map coordinates
      * @throws OutOfProjectionBoundsException if the specified point on the geographic space cannot be mapped to a point of the projected space
      */
-    public abstract double[] fromGeo(double longitude, double latitude) throws OutOfProjectionBoundsException;
+    public double[] fromGeo(double longitude, double latitude) throws OutOfProjectionBoundsException {
+        double lambda = Math.toRadians(longitude);
+        double phi = Math.toRadians(latitude);
+        return fromGeoNormalized(lambda, phi);
+    }
+
+    /**
+     * Converts geographic coordinates to map coordinates
+     *
+     * @param lambda - longitude (normalized)
+     * @param phi  - latitude, (normalized)
+     * @return {x, y} map coordinates
+     */
+    public abstract double[] fromGeoNormalized(double lambda, double phi);
 
     /**
      * Gives an estimation of the scale of this projection.

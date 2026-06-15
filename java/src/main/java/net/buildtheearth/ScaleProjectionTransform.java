@@ -26,13 +26,14 @@ public class ScaleProjectionTransform extends ProjectionTransform {
     }
 
     @Override
-    public double[] toGeo(double x, double y) throws OutOfProjectionBoundsException {
-        return this.input.toGeo(x / this.scaleX, y / this.scaleY);
+    public double[] inverseTransform(double[] xy) {
+        xy[0] /= this.scaleX;
+        xy[1] /= this.scaleY;
+        return xy;
     }
 
     @Override
-    public double[] fromGeo(double lon, double lat) throws OutOfProjectionBoundsException {
-        double[] p = this.input.fromGeo(lon, lat);
+    public double[] transform(double[] p) {
         p[0] *= this.scaleX;
         p[1] *= this.scaleY;
         return p;
