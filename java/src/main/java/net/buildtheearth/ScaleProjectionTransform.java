@@ -26,17 +26,17 @@ public class ScaleProjectionTransform extends ProjectionTransform {
     }
 
     @Override
-    public double[] inverseTransform(double[] xy) {
-        xy[0] /= this.scaleX;
-        xy[1] /= this.scaleY;
-        return xy;
+    public double[] inverseTransformNormalized(double x, double y) {
+        x /= this.scaleX;
+        y /= this.scaleY;
+        return new double[] { x, y };
     }
 
     @Override
-    public double[] transform(double[] p) {
-        p[0] *= this.scaleX;
-        p[1] *= this.scaleY;
-        return p;
+    public double[] transformNormalized(double x, double y) {
+        x *= this.scaleX;
+        y *= this.scaleY;
+        return new double[] { x, y };
     }
 
     @Override

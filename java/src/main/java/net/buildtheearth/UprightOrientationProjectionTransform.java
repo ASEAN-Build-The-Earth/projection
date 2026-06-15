@@ -14,9 +14,13 @@ public class UprightOrientationProjectionTransform extends ProjectionTransform {
     }
 
     @Override
-    public double[] transform(double[] p) {
-        p[1] = -p[1];
-        return p;
+    public double[] transformNormalized(double x, double y) {
+        return new double[] { x, -y };
+    }
+
+    @Override
+    public double[] inverseTransformNormalized(double x, double y) {
+        return new double[] { x, -y };
     }
 
     @Override

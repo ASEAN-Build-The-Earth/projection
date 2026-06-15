@@ -341,7 +341,8 @@ public class Airocean extends GeographicProjection {
         return this.inverseTriangleTransformNewton(x, y);
     }
 
-    protected double[] transformNormalized(double lambda, double phi) {
+    @Override
+    public double[] transformNormalized(double lambda, double phi) {
         double[] vector = MathUtils.spherical2Cartesian(new double[]{ lambda, phi });
 
         int face = this.findTriangle(vector);
@@ -371,25 +372,17 @@ public class Airocean extends GeographicProjection {
     }
 
     @Override
-    public double[] fromGeo(double longitude, double latitude) {
-        double[] spherical = MathUtils.geo2Spherical(new double[]{ longitude, latitude });
-        double lambda = spherical[0];
-        double phi = spherical[1];
-        return transformNormalized(lambda, phi);
+    protected double[] transform(double longitude, double latitude) {
+        return MathUtils.geo2Spherical(new double[]{ longitude, latitude });
     }
 
     @Override
-    public double[] fromGeoNormalized(double lambda, double phi) {
-        return transformNormalized(lambda, phi);
-    }
-
-    @Override
-    public double[] toGeoNormalized(double lambda, double phi) {
+    protected double[] inverseTransform(double lambda, double phi) {
         return MathUtils.spherical2Geo(new double[]{ lambda, phi });
     }
 
     @Override
-    public double[] toGeo(double x, double y) throws OutOfProjectionBoundsException {
+    public double[] inverseTransformNormalized(double x, double y) throws OutOfProjectionBoundsException {
         int face = findTriangleGrid(x, y);
 
         if (face == -1) throw OutOfProjectionBoundsException.get();
@@ -428,9 +421,8 @@ public class Airocean extends GeographicProjection {
         double[] vec = new double[] {x, y, z};
         //apply inverse rotation matrix (move triangle from template triangle to correct position on globe)
         double[] vecp = MathUtils.matVecProdD(INVERSE_ROTATION_MATRICES[face], vec);
-        double[] spherical = MathUtils.cartesian2Spherical(vecp);
 
-        return toGeoNormalized(spherical[0], spherical[1]);
+        return MathUtils.cartesian2Spherical(vecp);
     }
 
     @Override

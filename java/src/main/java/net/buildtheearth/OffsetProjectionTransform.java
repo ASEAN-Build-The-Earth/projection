@@ -31,16 +31,16 @@ public class OffsetProjectionTransform extends ProjectionTransform {
     }
 
     @Override
-    public double[] inverseTransform(double[] pos) {
-        pos[0] -= this.deltaX;
-        pos[1] -= this.deltaY;
-        return pos;
+    public double[] inverseTransformNormalized(double x, double y) {
+        x -= this.deltaX;
+        y -= this.deltaY;
+        return new double[] { x, y };
     }
 
     @Override
-    public double[] transform(double[] pos) {
-        pos[0] += this.deltaX;
-        pos[1] += this.deltaY;
-        return pos;
+    public double[] transformNormalized(double x, double y) {
+        x += this.deltaX;
+        y += this.deltaY;
+        return new double[] { x, y };
     }
 }

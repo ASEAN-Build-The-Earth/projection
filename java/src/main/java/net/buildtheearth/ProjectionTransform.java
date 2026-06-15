@@ -10,12 +10,6 @@ public abstract class ProjectionTransform extends GeographicProjection {
         this.input = input;
     }
 
-    public abstract double[] transform(double[] xy);
-
-    public double[] inverseTransform(double[] xy) {
-        return transform(xy);
-    };
-
     @Override
     public boolean upright() {
         return this.input.upright();
@@ -32,26 +26,12 @@ public abstract class ProjectionTransform extends GeographicProjection {
     }
 
     @Override
-    public double[] toGeo(double x, double y) throws OutOfProjectionBoundsException {
-        double[] p = inverseTransform(new double[] { x, y });
-        return this.input.toGeo(p[0], p[1]);
+    protected double[] inverseTransform(double x, double y) throws OutOfProjectionBoundsException {
+        return this.input.toGeo(x, y);
     }
 
     @Override
-    public double[] toGeoNormalized(double lambda, double phi) {
-        double[] p = input.toGeoNormalized(lambda, phi);
-        return inverseTransform(p);
-    }
-
-    @Override
-    public double[] fromGeoNormalized(double lambda, double phi) {
-        double[] p = input.fromGeoNormalized(lambda, phi);
-        return transform(p);
-    }
-
-    @Override
-    public double[] fromGeo(double longitude, double latitude) throws OutOfProjectionBoundsException {
-        double[] p = this.input.fromGeo(longitude, latitude);
-        return transform(p);
+    protected double[] transform(double longitude, double latitude) throws OutOfProjectionBoundsException {
+        return this.input.fromGeo(longitude, latitude);
     }
 }
